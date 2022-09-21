@@ -1,13 +1,19 @@
 # https://github.com/jackharrisonsherlock/common
 
-# Prompt symbol
-COMMON_PROMPT_SYMBOL="❯"
+COMMON_PROMPT_SYMBOL="➜"
+
+# Left Prompt
+PROMPT='$(common_host)$(common_current_dir)$(common_bg_jobs)$(elapsed_time)$(common_return_status)'
+
+# Right Prompt
+RPROMPT='$(common_git_status)'
 
 # Colors
+CUSTOM_COLORS_ELAPSED_TIME=red
+CUSTOM_COLORS_CURRENT_TIMESTAMP=red
 COMMON_COLORS_HOST_ME=green
-COMMON_COLORS_HOST_AWS_VAULT=yellow
-COMMON_COLORS_CURRENT_DIR=blue
-COMMON_COLORS_RETURN_STATUS_TRUE=magenta
+COMMON_COLORS_CURRENT_DIR=cyan
+COMMON_COLORS_RETURN_STATUS_TRUE=green
 COMMON_COLORS_RETURN_STATUS_FALSE=yellow
 COMMON_COLORS_GIT_STATUS_DEFAULT=green
 COMMON_COLORS_GIT_STATUS_STAGED=red
@@ -15,18 +21,28 @@ COMMON_COLORS_GIT_STATUS_UNSTAGED=yellow
 COMMON_COLORS_GIT_PROMPT_SHA=green
 COMMON_COLORS_BG_JOBS=yellow
 
-# Left Prompt
- PROMPT='$(common_host)$(common_current_dir)$(common_bg_jobs)$(common_return_status)'
+# --------------------------------------
+# Individual functoins
 
-# Right Prompt
- RPROMPT='$(common_git_status)'
+# Elapsed time
+# Ref: https://gist.github.com/knadh/123bca5cfdae8645db750bfb49cb44b0
+function preexec() {
+  timer=$(($(print -P %D{%s%6.})/1000))
+}
 
-# Enable redrawing of prompt variables
- setopt promptsubst
+elapsed_time() {
+  if [ $timer ]; then
+    now=$(($(print -P %D{%s%6.})/1000))
+    elapsed=$(($now-$timer))
 
-# Prompt with current SHA
-# PROMPT='$(common_host)$(common_current_dir)$(common_bg_jobs)$(common_return_status)'
-# RPROMPT='$(common_git_status) $(git_prompt_short_sha)'
+    unset timer
+    echo "%F{$CUSTOM_COLORS_ELAPSED_TIME}(${elapsed}ms)%{$reset_color%} "
+  fi
+}
+# Timestamp
+current_timestamp() {
+  echo "%{$fg_bold[$CUSTOM_COLORS_CURRENT_TIMESTAMP]%}%*%{$reset_color%}"
+}
 
 # Host
 common_host() {
@@ -38,14 +54,11 @@ common_host() {
   if [[ -n $me ]]; then
     echo "%{$fg[$COMMON_COLORS_HOST_ME]%}$me%{$reset_color%}:"
   fi
-  if [[ $AWS_VAULT ]]; then
-    echo "%{$fg[$COMMON_COLORS_HOST_AWS_VAULT]%}$AWS_VAULT%{$reset_color%} "
-  fi
 }
 
 # Current directory
 common_current_dir() {
-  echo -n "%{$fg[$COMMON_COLORS_CURRENT_DIR]%}%c "
+  echo -n "%{$fg_bold[$COMMON_COLORS_CURRENT_DIR]%}%c%{$reset_color%} "
 }
 
 # Prompt symbol
