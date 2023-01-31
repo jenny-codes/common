@@ -47,12 +47,13 @@ current_timestamp() {
 # Host
 common_host() {
   if [[ -n $SSH_CONNECTION ]]; then
-    me="%n@%m"
+    hostname=$(hostname -A | sed 's/ //g')
+    me="%n@${hostname}"
   elif [[ $LOGNAME != $USER ]]; then
     me="%n"
   fi
   if [[ -n $me ]]; then
-    echo "%{$fg[$COMMON_COLORS_HOST_ME]%}$me%{$reset_color%}:"
+    echo "%{$fg[$COMMON_COLORS_HOST_ME]%}$me%{$reset_color%} "
   fi
 }
 
