@@ -3,7 +3,7 @@
 COMMON_PROMPT_SYMBOL="➜"
 
 # Left Prompt
-PROMPT='$(common_host)$(common_current_dir)$(common_bg_jobs)$(elapsed_time)$(common_return_status)'
+PROMPT='$(common_host)$(common_current_dir)$(common_bg_jobs)$(common_return_status)'
 
 # Right Prompt
 RPROMPT='$(common_git_status)'
@@ -26,19 +26,19 @@ COMMON_COLORS_BG_JOBS=yellow
 
 # Elapsed time
 # Ref: https://gist.github.com/knadh/123bca5cfdae8645db750bfb49cb44b0
-function preexec() {
-  timer=$(($(print -P %D{%s%6.})/1000))
-}
+# function preexec() {
+#   timer=$(($(print -P %D{%s%6.}) / 1000))
+# }
 
-elapsed_time() {
-  if [ $timer ]; then
-    now=$(($(print -P %D{%s%6.})/1000))
-    elapsed=$(($now-$timer))
+# elapsed_time() {
+#   if [ $timer ]; then
+#     now=$(($(print -P %D{%s%6.}) / 1000))
+#     elapsed=$(($now - $timer))
 
-    unset timer
-    echo "%F{$CUSTOM_COLORS_ELAPSED_TIME}(${elapsed}ms)%{$reset_color%} "
-  fi
-}
+#     unset timer
+#     echo "%F{$CUSTOM_COLORS_ELAPSED_TIME}(${elapsed}ms)%{$reset_color%} "
+#   fi
+# }
 # Timestamp
 current_timestamp() {
   echo "%{$fg_bold[$CUSTOM_COLORS_CURRENT_TIMESTAMP]%}%*%{$reset_color%}"
@@ -69,25 +69,25 @@ common_return_status() {
 
 # Git status
 common_git_status() {
-    local message=""
-    local message_color="%F{$COMMON_COLORS_GIT_STATUS_DEFAULT}"
+  local message=""
+  local message_color="%F{$COMMON_COLORS_GIT_STATUS_DEFAULT}"
 
-    # https://git-scm.com/docs/git-status#_short_format
-    local staged=$(git status --porcelain 2>/dev/null | grep -e "^[MADRCU]")
-    local unstaged=$(git status --porcelain 2>/dev/null | grep -e "^[MADRCU? ][MADRCU?]")
+  # https://git-scm.com/docs/git-status#_short_format
+  local staged=$(git status --porcelain 2>/dev/null | grep -e "^[MADRCU]")
+  local unstaged=$(git status --porcelain 2>/dev/null | grep -e "^[MADRCU? ][MADRCU?]")
 
-    if [[ -n ${staged} ]]; then
-        message_color="%F{$COMMON_COLORS_GIT_STATUS_STAGED}"
-    elif [[ -n ${unstaged} ]]; then
-        message_color="%F{$COMMON_COLORS_GIT_STATUS_UNSTAGED}"
-    fi
+  if [[ -n ${staged} ]]; then
+    message_color="%F{$COMMON_COLORS_GIT_STATUS_STAGED}"
+  elif [[ -n ${unstaged} ]]; then
+    message_color="%F{$COMMON_COLORS_GIT_STATUS_UNSTAGED}"
+  fi
 
-    local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
-    if [[ -n ${branch} ]]; then
-        message+="${message_color}${branch}%f"
-    fi
+  local branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null)
+  if [[ -n ${branch} ]]; then
+    message+="${message_color}${branch}%f"
+  fi
 
-    echo -n "${message}"
+  echo -n "${message}"
 }
 
 # Git prompt SHA
